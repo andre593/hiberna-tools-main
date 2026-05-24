@@ -16,7 +16,6 @@ serve(async (req) => {
       throw new Error('A variavel GEMINI_API_KEY nao foi configurada no Supabase.');
     }
 
-    // Endpoint oficial na v1 estável
     const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
 
     const response = await fetch(url, {
