@@ -23,7 +23,6 @@ serve(async (req) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        // CORRIGIDO AQUI: system_instruction com underline para a API v1 aceitar
         system_instruction: {
           parts: [{ 
             text: "You are an expert AI image prompt engineer. Output ONLY the final raw prompt text. Never include introduction, conversational text, markdown blocks, or quotes. Start directly with the prompt." 
