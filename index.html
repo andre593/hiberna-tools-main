@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Capa — Hiberna</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+  :root { --neon: #00f5d4; --bg: #050a0f; --card: #0b1520; --border: rgba(0,245,212,0.3); }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); font-family: 'Rajdhani', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; }
+  h1 { font-family: 'Orbitron', sans-serif; font-size: clamp(1.2rem,5vw,1.8rem); color: var(--neon); text-align: center; letter-spacing: .15em; text-shadow: 0 0 20px rgba(0,245,212,.5); margin-bottom: 6px; }
+  .subtitle { color: rgba(255,255,255,.4); font-size: .9rem; text-align: center; letter-spacing: .1em; margin-bottom: 32px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; width: 100%; max-width: 560px; }
+  label { display: block; color: var(--neon); font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; margin-bottom: 8px; font-family: 'Orbitron',sans-serif; }
+  input, select { width: 100%; background: rgba(0,0,0,.4); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; color: #fff; font-family: 'Rajdhani',sans-serif; font-size: 1rem; outline: none; transition: border-color .3s; margin-bottom: 20px; }
+  input:focus, select:focus { border-color: var(--neon); box-shadow: 0 0 16px rgba(0,245,212,.2); }
+  input::placeholder { color: rgba(255,255,255,.25); }
+  select option { background: #0b1520; }
+  button { width: 100%; background: linear-gradient(135deg,var(--neon),#00b8a0); border: none; border-radius: 8px; padding: 14px; color: #050a0f; font-family: 'Orbitron',sans-serif; font-size: .85rem; font-weight: 700; letter-spacing: .15em; cursor: pointer; transition: all .3s; }
+  button:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,245,212,.4); }
+  button.loading { opacity: .7; cursor: wait; }
+  .spinner { display: none; width: 16px; height: 16px; border: 2px solid rgba(0,0,0,.3); border-top-color: #050a0f; border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto; }
+  .spinner.show { display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .result { margin-top: 24px; display: none; animation: fadeIn .5s ease; }
+  .result.show { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .divider { height: 1px; background: linear-gradient(to right,transparent,var(--border),transparent); margin: 20px 0; }
+  .result-label { color: rgba(255,255,255,.5); font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; font-family: 'Orbitron',sans-serif; margin-bottom: 10px; }
+  .prompt-box { background: rgba(0,0,0,.5); border: 1px solid rgba(0,245,212,.2); border-radius: 10px; padding: 16px; color: rgba(255,255,255,.85); font-size: .88rem; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+  .copy-btn { margin-top: 12px; background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 10px; color: var(--neon); font-size: .75rem; letter-spacing: .15em; }
+  .copy-btn:hover { background: rgba(0,245,212,.08); }
+  .tag { display: inline-block; background: rgba(0,245,212,.1); border: 1px solid rgba(0,245,212,.25); border-radius: 4px; padding: 2px 8px; font-size: .7rem; color: var(--neon); letter-spacing: .1em; margin-bottom: 16px; }
+  .tip { font-size: .78rem; color: rgba(255,255,255,.3); text-align: center; margin-top: 16px; line-height: 1.5; }
+  .tip span { color: rgba(0,245,212,.6); }
+  .info-box { background: rgba(255,165,0,.05); border: 1px solid rgba(255,165,0,.2); border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; }
+  .info-box p { color: rgba(255,165,0,.8); font-size: .78rem; line-height: 1.5; }
+  .info-box a { color: var(--neon); }
+</style>
+</head>
+<body>
+<h1>GERADOR DE CAPA</h1>
+<p class="subtitle">BIBLIOTECA HIBERNA · ESTILO NEON DARK</p>
+
+<div class="card">
+  <span class="tag">HIBERNA TOOLS</span>
+
+  <div class="info-box">
+    <p>Cole sua <strong>Supabase Anon Key</strong> abaixo para usar.<br>
+    Pega em: <a href="https://supabase.com/dashboard" target="_blank">supabase.com/dashboard</a> → Settings → API → anon key<br>
+    A chave fica salva no seu navegador automaticamente.</p>
+  </div>
+
+  <label>Supabase Anon Key</label>
+  <input type="password" id="supabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+
+  <label>Titulo do Livro</label>
+  <input type="text" id="titulo" placeholder="Ex: Mente Blindada" maxlength="80">
+
+  <label>Subtitulo (opcional)</label>
+  <input type="text" id="subtitulo" placeholder="Ex: O poder do foco total" maxlength="80">
+
+  <label>Categoria</label>
+  <select id="categoria">
+    <option value="mentalidade">Mentalidade de Elite</option>
+    <option value="financas">Prosperidade e Financas</option>
+    <option value="comunidade">Comunidade / Inspiracao</option>
+    <option value="espiritualidade">Espiritualidade</option>
+    <option value="habitos">Habitos e Produtividade</option>
+    <option value="relacionamentos">Relacionamentos</option>
+    <option value="saude">Saude e Bem-Estar</option>
+    <option value="lideranca">Lideranca</option>
+  </select>
+
+  <button id="btn" onclick="gerarPrompt()">
+    <span id="btn-text">GERAR PROMPT DA CAPA</span>
+    <span class="spinner" id="spinner"></span>
+  </button>
+
+  <div class="result" id="result">
+    <div class="divider"></div>
+    <div class="result-label">Prompt Gerado</div>
+    <div class="prompt-box" id="prompt-output"></div>
+    <button class="copy-btn" onclick="copiar()">COPIAR PROMPT</button>
+  </div>
+
+  <p class="tip">Cole o prompt no <span>Midjourney, DALL-E, Ideogram ou Leonardo AI</span></p>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://gmqeuazjcayooupyhuwx.supabase.co';
+
+const categorias = {
+  mentalidade: { simbolos: "chess piece, eye, brain, shield, mountain peak, geometric shapes, golden crown", cores: "electric teal and deep purple neon glows", mood: "powerful, focused, elite warrior energy" },
+  financas: { simbolos: "gold coins, rising graph chart, key, dollar signs, treasure chest, stock market arrows", cores: "teal neon and golden amber highlights", mood: "wealth, prosperity, financial freedom, abundance" },
+  comunidade: { simbolos: "glowing light bulb, connected dots network, rising sun, dove, open hands, compass", cores: "cyan neon and warm white glow", mood: "inspiring, uplifting, hope, community, transformation" },
+  espiritualidade: { simbolos: "cosmic universe, stars, sacred geometry, lotus, glowing orb, constellation, galaxy", cores: "violet and gold mystical neon", mood: "mystical, transcendent, spiritual awakening" },
+  habitos: { simbolos: "clock gears, checklist, rocket launch, target arrow, calendar, lightning bolt", cores: "electric blue and green neon", mood: "disciplined, efficient, unstoppable momentum" },
+  relacionamentos: { simbolos: "two hearts, bridge, handshake, mirror, butterfly, constellation forming two people", cores: "rose gold and teal neon", mood: "connection, love, emotional depth, bonds" },
+  saude: { simbolos: "glowing human silhouette, DNA helix, heartbeat line, lotus, clean water droplet", cores: "emerald green and white neon", mood: "vitality, healing, strength, wellness" },
+  lideranca: { simbolos: "golden crown, compass, chess king piece, eagle, spotlight, podium", cores: "gold and deep blue neon", mood: "authority, vision, command, leadership" }
+};
+
+window.onload = () => {
+  const saved = localStorage.getItem('hiberna_supa_key');
+  if (saved) document.getElementById('supabaseKey').value = saved;
+};
+
+document.getElementById('supabaseKey').addEventListener('change', e => {
+  if (e.target.value) localStorage.setItem('hiberna_supa_key', e.target.value);
+});
+
+async function gerarPrompt() {
+  const titulo = document.getElementById('titulo').value.trim();
+  const subtitulo = document.getElementById('subtitulo').value.trim();
+  const categoria = document.getElementById('categoria').value;
+  const supabaseKey = document.getElementById('supabaseKey').value.trim();
+
+  if (!supabaseKey) { alert('Cole sua Supabase Anon Key primeiro!'); document.getElementById('supabaseKey').focus(); return; }
+  if (!titulo) { document.getElementById('titulo').style.borderColor='#ff4466'; setTimeout(()=>document.getElementById('titulo').style.borderColor='rgba(0,245,212,0.3)',1500); document.getElementById('titulo').focus(); return; }
+
+  const btn = document.getElementById('btn');
+  const btnText = document.getElementById('btn-text');
+  const spinner = document.getElementById('spinner');
+  btn.classList.add('loading'); btnText.style.display='none'; spinner.classList.add('show');
+
+  const cat = categorias[categoria];
+  const subtituloInfo = subtitulo ? 'Subtitle: "' + subtitulo + '".' : '';
+
+  const userPrompt = 'You are an expert AI image prompt engineer specializing in dark neon book covers.\n\nGenerate a single detailed image prompt for a book cover:\n\nBook Title: "' + titulo + '"\n' + subtituloInfo + '\nCategory: ' + categoria + '\nSymbols: ' + cat.simbolos + '\nColors: ' + cat.cores + '\nMood: ' + cat.mood + '\n\nREQUIREMENTS:\n- Physical book in 3/4 perspective, slightly floating\n- Very dark background (#050a0f)\n- Glowing neon border frame (teal/cyan #00f5d4)\n- Title "' + titulo + '" visible in bold futuristic font\n- Cinematic neon lighting teal dominant, purple secondary\n- Subtle particle effects around the book\n- Photorealistic with glossy pages visible\n- Style: digital art, hyper-detailed, 8k, cinematic, cyberpunk\n\nOutput ONLY the prompt text, 120-180 words, no explanations.';
+
+  try {
+    const response = await fetch(SUPABASE_URL + '/functions/v1/gerar-prompt-capa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + supabaseKey, 'apikey': supabaseKey },
+      body: JSON.stringify({ prompt: userPrompt })
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Erro na Edge Function');
+    document.getElementById('prompt-output').textContent = data.result || 'Erro ao gerar.';
+    document.getElementById('result').classList.add('show');
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } catch(e) {
+    document.getElementById('prompt-output').textContent = 'Erro: ' + e.message + '\n\nCertifique-se que a Edge Function "gerar-prompt-capa" esta deployada no Supabase.';
+    document.getElementById('result').classList.add('show');
+  }
+
+  btn.classList.remove('loading'); btnText.style.display='inline'; spinner.classList.remove('show');
+}
+
+function copiar() {
+  navigator.clipboard.writeText(document.getElementById('prompt-output').textContent).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'COPIADO!';
+    setTimeout(() => btn.textContent = 'COPIAR PROMPT', 2000);
+  });
+}
+
+document.getElementById('titulo').addEventListener('keydown', e => { if(e.key==='Enter') gerarPrompt(); });
+</script>
+</body>
+</html>
