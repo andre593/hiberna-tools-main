@@ -12,23 +12,18 @@ serve(async (req) => {
     const { prompt } = await req.json();
     const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
 
-    if (!geminiApiKey) {
-      throw new Error('A variavel GEMINI_API_KEY nao foi configurada no Supabase.');
-    }
+    if (!geminiApiKey) throw new Error('GEMINI_API_KEY não configurada.');
 
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`;
 
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        system_instruction: {
-          parts: [{ 
-            text: "You are an expert AI image prompt engineer. Output ONLY the final raw prompt text. Never include introduction, conversational text, markdown blocks, or quotes. Start directly with the prompt." 
-          }]
-        },
         contents: [{
-          parts: [{ text: prompt }]
+          parts: [{ 
+            text: "You are an expert AI image prompt engineer. Output ONLY the final raw prompt text, no explanations.\n\n" + prompt 
+          }]
         }],
         generationConfig: {
           temperature: 0.75,
